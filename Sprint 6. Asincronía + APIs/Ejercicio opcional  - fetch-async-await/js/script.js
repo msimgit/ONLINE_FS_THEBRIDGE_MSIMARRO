@@ -10,59 +10,60 @@ const resetBtn = document.getElementById("resetBtn");
 
 const LIMIT = 10;
 let offset = 0;
+let selectedPokemon = null;
 
 // =======================
 // Obtener lista de Pokémon (10 en 10)
 // =======================
 const getPokemonList = async () => {
-    try {
-        const response = await fetch(
-        `https://pokeapi.co/api/v2/pokemon?limit=${LIMIT}&offset=${offset}`
-        );
-        if (!response.ok) {
-            throw new Error("Error al obtener la lista de Pokémon");
-        }
-        const data = await response.json();
-        renderPokemonList(data.results);
-        renderRange()
-    } catch (error) {
-        console.error(error);
-        app.innerHTML = "<p>Error al obtener la lista de Pokémon</p>";
+  try {
+    const response = await fetch(
+      `https://pokeapi.co/api/v2/pokemon?limit=${LIMIT}&offset=${offset}`
+    );
+    if (!response.ok) {
+      throw new Error("Error al obtener la lista de Pokémon");
     }
+    const data = await response.json();
+    renderPokemonList(data.results);
+    renderRange()
+  } catch (error) {
+    console.error(error);
+    app.innerHTML = "<p>Error al obtener la lista de Pokémon</p>";
+  }
 };
 
 // =======================
 // Obtener detalles de un Pokémon
 // =======================
 const getPokemonDetails = async (url) => {
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error("Error al obtener los detalles del Pokémon");
-        }
-        return await response.json();
-    } catch (error) {
-        console.error(error);
-        return null;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error("Error al obtener los detalles del Pokémon");
     }
+    return await response.json();
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 };
 
 // =======================
 // Renderizar lista de Pokémon
 // =======================
 const renderPokemonList = async (pokemonList) => {
-    app.innerHTML = "";
-    for (const pokemon of pokemonList) {
-        const data = await getPokemonDetails(pokemon.url);
-        if (!data) continue;
-        const card = document.createElement("div");
-        card.className = "pokemon-card";
-        card.innerHTML = `
+  app.innerHTML = "";
+  for (const pokemon of pokemonList) {
+    const data = await getPokemonDetails(pokemon.url);
+    if (!data) continue;
+    const card = document.createElement("div");
+    card.className = "pokemon-card";
+    card.innerHTML = `
         <img src="${data.sprites.front_default}" alt="${data.name}">
         <h3>${data.name}</h3>
         `;
-        app.appendChild(card);
-    }
+    app.appendChild(card);
+  }
 };
 
 // =======================
@@ -75,7 +76,7 @@ const renderRange = () => {
 };
 
 // =======================
-// Navaegación por la lista de Pokémon
+// Navegación por la lista de Pokémon
 // =======================
 // Botón Next
 nextBtn.addEventListener("click", () => {
@@ -99,10 +100,10 @@ getPokemonList();
 // Reseteo de la lista y búsqueda
 // =======================
 resetBtn.addEventListener("click", () => {
-    offset = 0;
-    searchInput.value = "";
-    bug.innerHTML = "";
-    getPokemonList();
+  offset = 0;
+  searchInput.value = "";
+  bug.innerHTML = "";
+  getPokemonList();
 });
 
 
@@ -115,13 +116,10 @@ const searchPokemon = async (name) => {
     const response = await fetch(
       `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`
     );
-
     if (!response.ok) {
       throw new Error("Pokémon no encontrado");
     }
-
     const pokemon = await response.json();
-
     // Extraemos sprites disponibles
     const sprites = [
       pokemon.sprites.front_default,
@@ -129,60 +127,55 @@ const searchPokemon = async (name) => {
       pokemon.sprites.front_shiny,
       pokemon.sprites.back_shiny
     ].filter(Boolean);
-
     bug.innerHTML = `
       <div class="pokemon-search-card">
-        
-        <!-- Header -->
-        <div class="card-header">
-          <h2>${pokemon.name}</h2>
-          <span class="hp">HP ${pokemon.stats[0].base_stat}</span>
-        </div>
-
-        <!-- Imágenes -->
-        <div class="card-images">
-          ${sprites.map(src => `<img src="${src}" alt="${pokemon.name}">`).join("")}
-        </div>
-
-        <!-- Tipos -->
-        <div class="card-types">
-          ${pokemon.types
-            .map(
-              t => `<span class="type ${t.type.name}">${t.type.name}</span>`
-            )
-            .join("")}
-        </div>
-
-        <!-- Información -->
-        <div class="card-features">
-            <div class="feature-card">
-                <span class="feature-title">Altura</span>
-                <span class="feature-value">${pokemon.height}</span>
-            </div>
-            <div class="feature-card">
-                <span class="feature-title">Peso</span>
-                <span class="feature-value">${pokemon.weight}</span>
-            </div>
-            <div class="feature-card wide">
-                <span class="feature-title">Habilidades</span>
-                <span class="feature-value">
-                ${pokemon.abilities.map(a => a.ability.name).join(", ")}
-                </span>
-            </div>
-        </div>
+          <!-- Header -->
+          <div class="card-header">
+              <h2>${pokemon.name}</h2>
+              <span class="hp">HP ${pokemon.stats[0].base_stat}</span>
+          </div>
+          <!-- Imágenes -->
+          <div class="card-images">
+              ${sprites.map(src => `<img src="${src}" alt="${pokemon.name}">`).join("")}
+          </div>
+          <!-- Tipos -->
+          <div class="card-types">
+             ${pokemon.types
+        .map(
+          t => `<span class="type ${t.type.name}">${t.type.name}</span>`
+        )
+        .join("")}
+          </div>
+          <!-- Información -->
+          <div class="card-features">
+               <div class="feature-card">
+                    <span class="feature-title">Altura</span>
+                    <span class="feature-value">${pokemon.height}</span>
+              </div>
+              <div class="feature-card">
+                  <span class="feature-title">Peso</span>
+                  <span class="feature-value">${pokemon.weight}</span>
+              </div>
+              <div class="feature-card wide">
+                  <span class="feature-title">Habilidades</span>
+                  <span class="feature-value">
+                  ${pokemon.abilities.map(a => a.ability.name).join(", ")}
+                  </span>
+              </div>
+          </div>
 
         <!-- Stats -->
         <div class="card-stats">
           ${pokemon.stats
-            .map(
-              stat => `
+        .map(
+          stat => `
                 <div>
                   <span>${stat.stat.name}</span>
                   <span>${stat.base_stat}</span>
                 </div>
               `
-            )
-            .join("")}
+        )
+        .join("")}
         </div>
 
       </div>
@@ -193,8 +186,8 @@ const searchPokemon = async (name) => {
 };
 
 searchBtn.addEventListener("click", () => {
-    const value = searchInput.value.trim();
-    if (value) {
-        searchPokemon(value);
-    }
+  const value = searchInput.value.trim();
+  if (value) {
+    searchPokemon(value);
+  }
 });
